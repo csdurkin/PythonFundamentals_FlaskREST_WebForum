@@ -2,7 +2,6 @@ from flask import Flask, request, jsonify
 from secrets import token_urlsafe
 from datetime import datetime
 import threading
-import uuid
 
 app = Flask(__name__)
 
@@ -22,27 +21,41 @@ def store_post():
         user_id = data.get('user_id')                       #Pull user_id from request data
         user_key = data.get('user_key')                     #Pull user_key from request data
         post_parentid = data.get('post_parentid')           #Specify what post is being replied to
-    
+
+        if not user_id or not user_key:
+            return jsonify({'err': 'User ID and user key are required.'}), 400
+
+        with lock:                                              #Ensrues one thread can exectue the section at a time
+
+            #Check if user exists
+            user = None
+
+            for existing_user in users.values():
+                if str(existing_user['id']) == str(user_id) and str(existing_user['key']) == str(user_key):
+                    user = existing_user
+                    break
+            
+            if not user:
+                return jsonify({'err': 'User not found.'}), 404
+
+            #if user['key'] != user_key:
+            #    return jsonify({'err': 'Invalid user credentials.'}), 403
+
+            #Create post data
+            post_id = len(posts) + 1                           
+            key = token_urlsafe(20)                             #Generate random key; token_urlsafe preferred method over randbelow or math.random
+            timestamp = datetime.utcnow().isoformat()           #Define by current time in UTC timezone; set to ISO format
+
+            #Store post
+            post_data = {'id': post_id, 'key': key, 'timestamp': timestamp, 'msg': msg, 'user_id': user_id, 'post_parentid': post_parentid}
+            posts[post_id] = post_data
+
     except KeyError:
         return jsonify({'err': 'Bad Request'}), 400         #400 Bad Request: Client-side error with request. Request not completed.
     
-
-    with lock:                                              #Ensrues one thread can exectue the section at a time
-
-        #Check if user exists
-        user = users.get(str(user_id))
-
-        if not user or user['key'] != user_key:             #Check if user does not exits or if user key incorrect
-            return jsonify({'err': 'Invalid user credentials.'}), 403        
-
-        #Create post data
-        post_id = str(uuid.uuid4())                         #Create new id (index in posts) using UUID; 
-        key = token_urlsafe(20)                             #Generate random key; token_urlsafe preferred method over randbelow or math.random
-        timestamp = datetime.utcnow().isoformat()           #Define by current time in UTC timezone; set to ISO format
-
-        #Store post
-        post_data = {'id': post_id, 'key': key, 'timestamp': timestamp, 'msg': msg, 'user_id': user_id, 'post_parentid': post_parentid}
-        posts[post_id] = post_data
+    except Exception as e:
+        app.logger.error(str(e))
+        return jsonify({'err': 'An error occurred while processing your request.'}), 500  # 500 Internal Server Error
 
     #Return JSON Object
     return jsonify(post_data)
@@ -55,8 +68,8 @@ def get_post(post_id):
     
     with lock:
 
-        post_data = posts.get(str(post_id))                     #UUID are strings. Ensure get uses strings as arguments
-
+        post_data = posts.get(post_id)
+        
         if not post_data: 
             return jsonify({'err': 'Post not found.'}), 404     #404 Not Found: Client-side Error. Resource does not exists on server.
 
@@ -85,7 +98,7 @@ def detele_post(post_id, key):
 
     with lock: 
 
-        post_data = posts.get(str(post_id))
+        post_data = posts.get(post_id)
 
         if not post_data: 
             return jsonify({'err': 'Post not found.'}), 404 
@@ -112,7 +125,7 @@ def create_user():
 
     try:
         data = request.get_json()
-        user_id = str(uuid.uuid4())     
+        user_id = len(users) + 1  # Simple incrementing integer ID
         user_key = token_urlsafe(20)
         user_screenname = data.get('user_screenname')
         user_realname = data.get('user_realname')
@@ -151,13 +164,15 @@ def get_user_metadata(user_identifier):
         
         user_data = None
         
+        #Check if matches 'id' key
         if user_identifier in users:
             user_data = users[user_identifier]
 
         else:
             
             for existing_user in users.values():
-                if 'user_screenname' in existing_user and existing_user['user_screenname'] == user_identifier:
+                
+                if str(existing_user.get('id')) == user_identifier or existing_user.get('user_screenname') == user_identifier:
                     user_data = existing_user
                     break
 
@@ -168,8 +183,8 @@ def get_user_metadata(user_identifier):
     
 #EXTENSION 2 (Cont): User Profiles, Edit Meta Data
     
-@app.route("/user/<string:user_id>/edit", methods=['PUT'])
-def edit_user_metadata(user_id):
+@app.route("/user/<string:user_identifier>/edit", methods=['PUT'])
+def edit_user_metadata(user_identifier):
 
     try:
         data = request.get_json()                          
@@ -182,9 +197,17 @@ def edit_user_metadata(user_id):
     
     with lock: 
         
-        user_data = users.get(str(user_id))
+        user_data = users.get(user_identifier)
 
-        if not user_data or user_data['key'] != user_key:                   #Check if the metadata's key matches the input key
+        # Check if the input is a user ID
+        if user_identifier.isdigit():
+            user_identifier = int(user_identifier)
+            user_data = users.get(user_identifier)
+
+        if not user_data:
+            return jsonify({'err': 'User not found.'}), 404
+
+        if not user_key or user_data['key'] != user_key:
             return jsonify({'err': 'Forbidden.'}), 403
 
         if new_user_realname:
@@ -194,6 +217,13 @@ def edit_user_metadata(user_id):
             user_data['user_screenname'] = new_user_screenname
 
     return jsonify(user_data)
+
+
+#GET ALL USERS
+@app.route("/user", methods=['GET'])
+def get_all_users():
+    with lock:
+        return jsonify(list(users.values()))
 
 
 #EXTENSION 4: DATE/TIME SEARCH
@@ -270,7 +300,3 @@ def search_user():
 
 if __name__ == '__main__':
     app.run(debug='True')
-
-
-#NOTES
-#ID SUPPOSED TO BE AN INTEGER
