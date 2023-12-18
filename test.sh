@@ -1,20 +1,25 @@
-#!/bin/sh
+#!/bin/bash
 
-# set -e: exit immediately if newman complains
-# "Exit on Error" Mode: If any command returns a non-zero exit status, script terminates, and  error sent to calling process
+# Exit immediately if a command exits with a non-zero status.
+# This ensures that any errors during script execution will cause it to terminate immediately.
 set -e
 
-#This line ensures that the script will automatically terminate any background processes it started when it exits.
-trap 'kill $PID' EXIT # kill the server on exit
+# Define a trap to ensure that the Flask application is stopped when the script exits.
+# The trap command will execute the 'kill $PID' command when the script exits.
+trap 'kill $PID' EXIT # Kill the server on exit
 
-#This line runs the "run.sh" script in the background by appending the "&" symbol at the end.
+# Start your Flask application using your script (e.g., run.sh) in the background.
+# The '&' symbol runs the script in the background.
 ./run.sh &
 
-#This line of code assigns the Process ID (PID) of the most recently executed background process to the variable "PID." 
-PID=$! # record the PID
+# Record the Process ID (PID) of the Flask application.
+# This allows us to track the background process.
+PID=$! # Record the PID
 
-#Executes Newman (a Postman command-line tool) to run a collection of API tests from "forum_multiple_posts.postman_collection.json" using the environment file "env.json."
-newman run forum_multiple_posts.postman_collection.json -e env.json # use the env file
+# Use Newman (a Postman command-line tool) to run API tests from "forum_multiple_posts.postman_collection.json."
+# The '-e' flag specifies the environment file to use.
+newman run forum_multiple_posts.postman_collection.json -e env.json # Use the env file
 
-#Runs Newman to execute the API tests defined in "forum_post_read_delete.postman_collection.json" with 50 iterations per test.
+# Run Newman to execute the API tests defined in "forum_post_read_delete.postman_collection.json" with 50 iterations per test.
+# The '-n' flag specifies the number of iterations.
 newman run forum_post_read_delete.postman_collection.json -n 50 # 50 iterations
