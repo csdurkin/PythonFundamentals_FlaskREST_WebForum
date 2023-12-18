@@ -14,8 +14,10 @@ PID=$! # Record the PID
 
 # Use Newman (a Postman command-line tool) to run API tests from "forum_multiple_posts.postman_collection.json."
 # The '-e' flag specifies the environment file to use.
-newman run forum_multiple_posts.postman_collection.json -e env.json # Use the env file
+newman run cdurkin_cs515_project3_collection.postman_collection.json -e env.json # Use the env file
 
 # Run Newman to execute the API tests defined in "forum_post_read_delete.postman_collection.json" with 50 iterations per test.
 # The '-n' flag specifies the number of iterations.
 newman run forum_post_read_delete.postman_collection.json -n 50 # 50 iterations
+
+
