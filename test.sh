@@ -6,7 +6,7 @@ set -e
 # The trap command will execute the 'kill $PID' command when the script exits.
 trap 'kill $PID' EXIT # Kill the server on exit
 
-# Start your Flask application using your script (e.g., run.sh) in the background.
+# Start Flask application using script (e.g., run.sh) in the background.
 ./run.sh &
 
 # Record the Process ID (PID) of the Flask application.
