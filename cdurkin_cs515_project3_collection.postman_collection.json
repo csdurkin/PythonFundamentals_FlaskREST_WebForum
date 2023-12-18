@@ -1,0 +1,665 @@
+{
+	"info": {
+		"_postman_id": "304b3480-7259-4d41-8dbd-c6005231ce17",
+		"name": "cdurkin_cs515_project3_collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31853434"
+	},
+	"item": [
+		{
+			"name": "Create_User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Check if the status code is 200 (Success)",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Check if the user is created successfully",
+							"pm.test(\"User is created successfully\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    ",
+							"    // Expect that the response JSON is not null",
+							"    pm.expect(jsonData).not.eql(null);",
+							"",
+							"    // Expect that the user_screenname in the response matches the expected value",
+							"    pm.expect(jsonData.user_screenname).to.eql(\"johndoe\");",
+							"    ",
+							"});",
+							"",
+							"// Test 3: Extract user_id and user_key from the response",
+							"pm.test(\"Extract user_id and user_key\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    ",
+							"    // Set the extracted user_id and user_key as environment variables",
+							"    pm.environment.set(\"createdUserId\", jsonData.id);",
+							"    pm.environment.set(\"createdUserKey\", jsonData.key);",
+							"    ",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_screenname\": \"johndoe\",\n    \"user_realname\": \"John Doe\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/user",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get_User_Metadata",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains user data\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.not.eql({});",
+							"});",
+							"",
+							"pm.test(\"User ID matches\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.id).to.eql(1); ",
+							"});",
+							"",
+							"pm.test(\"User screen name is present\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.user_screenname).to.exist;",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/user/1",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"user",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Edit_User_Metadata",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Check if the status code is 200 (Success)",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Check if the User screen name is updated correctly",
+							"pm.test(\"User screen name is updated correctly\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    ",
+							"    // Expect that the User screen name in the response matches the expected value",
+							"    pm.expect(jsonData.user_screenname).to.eql(\"janefonda\");",
+							"});",
+							"",
+							"// Test 3: Check if the User real name is updated correctly",
+							"pm.test(\"User real name is updated correctly\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    ",
+							"    // Expect that the User real name in the response matches the expected value",
+							"    pm.expect(jsonData.user_realname).to.eql(\"Jane Fonda\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Check if 'createdUserId' environment variable exists",
+							"if (!pm.environment.get(\"createdUserId\")) {",
+							"    pm.test.skip(\"Skipping edit metadata request since 'createdUserId' is not set. Please execute the 'create user' request first.\");",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_key\": \"{{createdUserKey}}\",\n    \"user_realname\": \"Jane Fonda\",\n    \"user_screenname\": \"janefonda\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/user/{{createdUserId}}/edit",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"user",
+						"{{createdUserId}}",
+						"edit"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create_Post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Check if the response status code is 200 (OK)",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Extract post_id and post_key from the response JSON and store them in environment variables",
+							"pm.test(\"Extract and store post_id and post_key\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.environment.set(\"createdPostId\", jsonData.id); // Store post_id in the environment variable",
+							"    ",
+							"    // Check if createdPostKey already exists in the environment",
+							"    if (!pm.environment.has(\"createdPostKey\")) {",
+							"        pm.environment.set(\"createdPostKey\", jsonData.key); // Store post_key only if it doesn't exist",
+							"    }",
+							"});",
+							"",
+							"// Test 3: Check if the response JSON contains the \"id\" field",
+							"pm.test(\"Response contains post ID\", function () {",
+							"    pm.expect(pm.response.json()).to.have.property(\"id\");",
+							"});",
+							"",
+							"// Test 4: Check if the response JSON contains the expected fields",
+							"pm.test(\"Response contains expected fields\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData).to.have.property(\"key\");",
+							"    pm.expect(jsonData).to.have.property(\"timestamp\");",
+							"    pm.expect(jsonData).to.have.property(\"msg\");",
+							"    pm.expect(jsonData).to.have.property(\"user_id\");",
+							"    pm.expect(jsonData).to.have.property(\"post_parentid\");",
+							"});",
+							"",
+							"// Test 5: Check if the \"id\" field is a positive integer",
+							"pm.test(\"Post ID is a positive integer\", function () {",
+							"    const id = pm.response.json().id;",
+							"    pm.expect(id).to.be.above(0);",
+							"    pm.expect(id % 1).to.equal(0); // Check if it's an integer",
+							"});",
+							"",
+							"// Test 6: Check if the \"key\" field is a string",
+							"pm.test(\"Post key is a string\", function () {",
+							"    const key = pm.response.json().key;",
+							"    pm.expect(key).to.be.a(\"string\");",
+							"});",
+							"",
+							"// Test 7: Check if the \"user_id\" field matches the expected user ID",
+							"pm.test(\"User ID matches expected user ID\", function () {",
+							"    const userId = pm.response.json().user_id;",
+							"    pm.expect(userId).to.eql(pm.environment.get(\"createdUserId\"));",
+							"});",
+							"",
+							"// Test 8: Check if the \"post_parentid\" field is null (since it's a new post)",
+							"pm.test(\"post_parentid is null\", function () {",
+							"    const postParentId = pm.response.json().post_parentid;",
+							"    pm.expect(postParentId).to.eql(null);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"msg\": \"Jane Fonda starred in Barbarella, They Shoot Horses Don't They, and Grace & Frankie.\",\n    \"user_id\": {{createdUserId}},\n    \"user_key\": \"{{createdUserKey}}\",\n    \"post_parentid\": null\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/post",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create_Post_Reply",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Check if the response status code is 200 (OK)",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Extract post_id and post_key from the response JSON and store them in environment variables",
+							"pm.test(\"Extract and store post_id and post_key\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.environment.set(\"createdPostId\", jsonData.id); // Store post_id in the environment variable",
+							"    ",
+							"    // Check if createdPostKey already exists in the environment",
+							"    if (!pm.environment.has(\"createdPostKey\")) {",
+							"        pm.environment.set(\"createdPostKey\", jsonData.key); // Store post_key only if it doesn't exist",
+							"    }",
+							"});",
+							"",
+							"// Test 3: Check if the response JSON contains the \"id\" field",
+							"pm.test(\"Response contains post ID\", function () {",
+							"    pm.expect(pm.response.json()).to.have.property(\"id\");",
+							"});",
+							"",
+							"// Test 4: Check if the response JSON contains the expected fields",
+							"pm.test(\"Response contains expected fields\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"    pm.expect(jsonData).to.have.property(\"key\");",
+							"    pm.expect(jsonData).to.have.property(\"timestamp\");",
+							"    pm.expect(jsonData).to.have.property(\"msg\");",
+							"    pm.expect(jsonData).to.have.property(\"user_id\");",
+							"    pm.expect(jsonData).to.have.property(\"post_parentid\");",
+							"});",
+							"",
+							"// Test 5: Check if the \"id\" field is a positive integer",
+							"pm.test(\"Post ID is a positive integer\", function () {",
+							"    const id = pm.response.json().id;",
+							"    pm.expect(id).to.be.above(0);",
+							"    pm.expect(id % 1).to.equal(0); // Check if it's an integer",
+							"});",
+							"",
+							"// Test 6: Check if the \"key\" field is a string",
+							"pm.test(\"Post key is a string\", function () {",
+							"    const key = pm.response.json().key;",
+							"    pm.expect(key).to.be.a(\"string\");",
+							"});",
+							"",
+							"// Test 7: Check if the \"user_id\" field matches the expected user ID",
+							"pm.test(\"User ID matches expected user ID\", function () {",
+							"    const userId = pm.response.json().user_id;",
+							"    pm.expect(userId).to.eql(pm.environment.get(\"createdUserId\"));",
+							"});",
+							"",
+							"// Test 8: Check if the \"post_parentid\" field is equal to the created post id",
+							"pm.test(\"post_parentid is correct\", function () {",
+							"    const postParentId = pm.response.json().post_parentid;",
+							"    pm.expect(postParentId).to.eql(pm.environment.get(\"createdPostId\"));",
+							"});",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"msg\": \"Jane Fonda starred in Barbarella, They Shoot Horses Don't They, and Grace & Frankie.\",\n    \"user_id\": {{createdUserId}},\n    \"user_key\": \"{{createdUserKey}}\",\n    \"post_parentid\": {{createdPostId}}\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/post",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"post"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get_Post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Check if the response status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Check if the response has the \"id\" field",
+							"pm.test(\"Response has ID field\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"id\");",
+							"});",
+							"",
+							"// Test 3: Check if the response has the \"key\" field",
+							"pm.test(\"Response has Key field\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"key\");",
+							"});",
+							"",
+							"// Test 4: Check if the response has the \"timestamp\" field",
+							"pm.test(\"Response has Timestamp field\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"timestamp\");",
+							"});",
+							"",
+							"// Test 5: Check if the response has the \"msg\" field",
+							"pm.test(\"Response has Message field\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"msg\");",
+							"});",
+							"",
+							"// Test 6: Check if the response has the \"replies\" field",
+							"pm.test(\"Response has Replies field\", function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property(\"replies\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000//post/{{createdPostId}}",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"",
+						"post",
+						"{{createdPostId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search_DateTime",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Check if the response status code is 200",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Check if the response is an array",
+							"pm.test(\"Response is an array\", function () {",
+							"    pm.expect(pm.response.json()).to.be.an('array');",
+							"});",
+							"",
+							"// Test 3: Check if posts are within the specified date range",
+							"pm.test(\"Check if posts are within the specified date range\", function () {",
+							"    // Extract posts from the response JSON",
+							"    var posts = pm.response.json();",
+							"",
+							"    // Define the start and end dates for the date range",
+							"    var startDate = new Date(\"2023-01-01T00:00:00Z\");",
+							"    var endDate = new Date(\"2023-12-31T23:59:59Z\");",
+							"",
+							"    // Loop through each post and check if its timestamp is within the date range",
+							"    for (var i = 0; i < posts.length; i++) {",
+							"        var postTimestamp = new Date(posts[i].timestamp);",
+							"        pm.expect(postTimestamp).to.be.within(startDate, endDate);",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/posts/search/datetime?start_datetime=2023-01-01T00:00:00Z&end_datetime=2023-12-31T23:59:59Z",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"posts",
+						"search",
+						"datetime"
+					],
+					"query": [
+						{
+							"key": "start_datetime",
+							"value": "2023-01-01T00:00:00Z"
+						},
+						{
+							"key": "end_datetime",
+							"value": "2023-12-31T23:59:59Z"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search_User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Check if the response status code is 200 (OK)",
+							"pm.test(\"Status code is 200 OK\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Check if the response is in JSON format",
+							"pm.test(\"Response is in JSON format\", function () {",
+							"    pm.response.to.be.json;",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/posts/search/user?user_id={{createdUserId}}",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"posts",
+						"search",
+						"user"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "{{createdUserId}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete_Post",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Test 1: Check if the status code is 200 (Success)",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// Test 2: Check if the response is an empty JSON object",
+							"pm.test(\"Response is an empty JSON object\", function () {",
+							"    pm.response.to.be.json;",
+							"    pm.expect(pm.response.json()).to.eql({});",
+							"});",
+							"",
+							"// Test 3: Check if the post was deleted successfully",
+							"pm.test(\"Post was deleted successfully\", function () {",
+							"    // Ensure that the response contains a success message or indicator (modify this based on your server's response)",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.eql(\"Post deleted successfully\");",
+							"    // You can add more specific checks here if your server provides additional details in the response.",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/post/{{createdPostId}}/delete/{{createdPostKey}}?user_id={{createdUserId}}&user_key={{createdUserKey}}",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"post",
+						"{{createdPostId}}",
+						"delete",
+						"{{createdPostKey}}"
+					],
+					"query": [
+						{
+							"key": "user_id",
+							"value": "{{createdUserId}}"
+						},
+						{
+							"key": "user_key",
+							"value": "{{createdUserKey}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
