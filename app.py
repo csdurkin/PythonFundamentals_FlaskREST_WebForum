@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from secrets import token_urlsafe
-from datetime import datetime
+from datetime import datetime, timezone
 import threading
 
 app = Flask(__name__)
@@ -39,12 +39,12 @@ def store_post():
                 return jsonify({'err': 'User not found.'}), 404
 
             #if user['key'] != user_key:
-            #    return jsonify({'err': 'Invalid user credentials.'}), 403
+                #return jsonify({'err': 'Invalid user credentials. Flag'}), 403
 
             #Create post data
             post_id = len(posts) + 1                           
             key = token_urlsafe(20)                             #Generate random key; token_urlsafe preferred method over randbelow or math.random
-            timestamp = datetime.utcnow().isoformat()           #Define by current time in UTC timezone; set to ISO format
+            timestamp = datetime.utcnow().replace(tzinfo=timezone.utc).isoformat() #Define by current time in UTC timezone; set to ISO format
 
             #Store post
             post_data = {'id': post_id, 'key': key, 'timestamp': timestamp, 'msg': msg, 'user_id': user_id, 'post_parentid': post_parentid}
@@ -87,21 +87,37 @@ def get_post(post_id):
     
 @app.route('/post/<int:post_id>/delete/<string:key>', methods=['DELETE'])
 def detele_post(post_id, key):
+
+    user_id = request.args.get('user_id')
+    user_key = request.args.get('user_key')
     
     try:
         data = request.get_json()
-        user_id = data.get('user_id')
-        user_key = data.get('user_key')
 
+        with lock: 
+
+            post_data = posts.get(post_id)
+
+            if not post_data: 
+                return jsonify({'err': 'Post not found.'}), 404 
+                
+            # Check if user exists
+            user = users.get(str(user_id))
+
+            if not user or user['key'] != user_key or user['key'] != post_data['key']:    
+                return jsonify({'err': 'Invalid user credentials.'}), 403        
+
+            if post_data['key'] != key: 
+                return jsonify({'err': 'Forbidden.'}), 403  
+
+            del posts[post_id]
+
+            return jsonify(post_data)
+        
     except KeyError:
         return jsonify({'err': 'Bad Request'}), 400 
 
-    with lock: 
-
-        post_data = posts.get(post_id)
-
-        if not post_data: 
-            return jsonify({'err': 'Post not found.'}), 404 
+    
         
  #Check if user exists
         user = users.get(str(user_id))
@@ -192,29 +208,29 @@ def edit_user_metadata(user_identifier):
         new_user_realname = data.get('user_realname')
         new_user_screenname = data.get('user_screenname')
     
-    except KeyError:
-        return jsonify({'err': 'Bad Request'}), 400
-    
-    with lock: 
-        
-        user_data = users.get(user_identifier)
-
-        # Check if the input is a user ID
-        if user_identifier.isdigit():
-            user_identifier = int(user_identifier)
+        with lock:
+            
             user_data = users.get(user_identifier)
 
-        if not user_data:
-            return jsonify({'err': 'User not found.'}), 404
+            # Check if the input is a user ID
+            if user_identifier.isdigit():
+                user_identifier = int(user_identifier)
+                user_data = users.get(user_identifier)
 
-        if not user_key or user_data['key'] != user_key:
-            return jsonify({'err': 'Forbidden.'}), 403
+            if not user_data:
+                return jsonify({'err': 'User not found.'}), 404
 
-        if new_user_realname:
-            user_data['user_realname'] = new_user_realname   
+            if not user_key or user_data['key'] != user_key:
+                return jsonify({'err': 'Forbidden. [Flag]'}), 403
 
-        if new_user_screenname:
-            user_data['user_screenname'] = new_user_screenname
+            if new_user_realname:
+                user_data['user_realname'] = new_user_realname
+
+            if new_user_screenname:
+                user_data['user_screenname'] = new_user_screenname
+                
+    except KeyError:
+        return jsonify({'err': 'Bad Request'}), 400
 
     return jsonify(user_data)
 
@@ -226,59 +242,60 @@ def get_all_users():
         return jsonify(list(users.values()))
 
 
-#EXTENSION 4: DATE/TIME SEARCH
+# EXTENSION 4: DATE/TIME SEARCH
 
 @app.route("/posts/search/datetime", methods=['GET'])
-def search_datetime(): 
-
+def search_datetime():
+    
     try:
-        start_datetime = request.args.get('start_datetime')
-        end_datetime = request.args.get('end_datetime')
-
-    except ValueError:
-        return jsonify({'err': 'Invalid date/time format.'}), 400
-
-    with lock: 
-
-        try:
-            #Convert input datetime strings to ISO format
-
-            if start_datetime:
-                start_datetime = datetime.fromisoformat(start_datetime)
-
-            if end_datetime: 
-                end_datetime = datetime.fromisoformat(end_datetime) 
-
-        except ValueError:
-            return jsonify({'err': 'Invalid date/time format.'}), 400
         
+        start_datetime_str = request.args.get('start_datetime')
+        end_datetime_str = request.args.get('end_datetime')
         posts_inrange = []
-
+        
+        if start_datetime_str:
+            start_datetime = datetime.fromisoformat(start_datetime_str).replace(tzinfo=timezone.utc)  #Fixes issue of comparing datetimes with different offset awareness
+        else:
+            start_datetime = None
+            
+        if end_datetime_str:
+            end_datetime = datetime.fromisoformat(end_datetime_str).replace(tzinfo=timezone.utc)
+        else:
+            end_datetime = None
+        
         for post_data in posts.values():
             
             post_timestamp = (post_data['timestamp'])
+            
+            if isinstance(post_timestamp, str):
+                post_timestamp = datetime.fromisoformat(post_timestamp)
 
-            #Check if post's timestamp is within range of user's timeframe (sets to True)
+            # Check if post's timestamp is within range of user's timeframe (sets to True)
             # or if user's time is not specified (sets to True)
-            start_datetime_check = start_datetime <= post_timestamp or not start_datetime
-            end_datetime_check = end_datetime >= post_timestamp or not end_datetime
+            start_datetime_check = start_datetime is None or (isinstance(post_timestamp, datetime) and start_datetime <= post_timestamp)
+            end_datetime_check = end_datetime is None or (isinstance(post_timestamp, datetime) and end_datetime >= post_timestamp)
 
-            #Add posts to array to be returned 
+            # Add posts to the array to be returned
             if start_datetime_check and end_datetime_check:
                 posts_inrange.append(post_data)
-
+        
         return jsonify(posts_inrange)
-    
+
+    except ValueError:
+        return jsonify({'err': 'Invalid date/time format.'}), 400
+        
 
 #EXTENSION 5: USER SEARCH
 
 @app.route("/posts/search/user", methods=['GET'])
 def search_user(): 
 
-    try:
-        user_id = request.args.get('user_id')
+    user_id_str = request.args.get('user_id')
 
-    except ValueError:
+    try:
+        user_id = int(user_id_str)
+
+    except (ValueError, TypeError):
         return jsonify({'err': 'Invalid user_id format.'}), 400
 
     with lock: 
