@@ -1,0 +1,487 @@
+{
+	"id": "33ba3048-616c-46ce-be82-0a1abf36a113",
+	"name": "cdurkin_cs515_project3_collection",
+	"timestamp": "2023-12-18T04:01:20.564Z",
+	"collection_id": "31853434-304b3480-7259-4d41-8dbd-c6005231ce17",
+	"folder_id": 0,
+	"environment_id": "31853434-9e0c7ee4-b934-4cdb-ac47-3f9607f59a74",
+	"totalPass": 36,
+	"delay": 0,
+	"persist": true,
+	"status": "finished",
+	"startedAt": "2023-12-18T04:01:20.047Z",
+	"totalFail": 4,
+	"results": [
+		{
+			"id": "87e7b4a0-8a8e-4f06-888f-2a69d7dbe82d",
+			"name": "Create_User",
+			"url": "http://127.0.0.1:5000/user",
+			"time": 4,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"User is created successfully": true,
+				"Extract user_id and user_key": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"User is created successfully": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Extract user_id and user_key": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"User is created successfully": true,
+					"Extract user_id and user_key": true
+				}
+			]
+		},
+		{
+			"id": "23beffe8-7549-431b-a473-6ed3b60396d9",
+			"name": "Get_User_Metadata",
+			"url": "http://127.0.0.1:5000/user/1",
+			"time": 3,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response contains user data": true,
+				"User ID matches": true,
+				"User screen name is present": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response contains user data": {
+					"pass": 1,
+					"fail": 0
+				},
+				"User ID matches": {
+					"pass": 1,
+					"fail": 0
+				},
+				"User screen name is present": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response contains user data": true,
+					"User ID matches": true,
+					"User screen name is present": true
+				}
+			]
+		},
+		{
+			"id": "03dc6592-4ce3-4442-84d8-c72483636826",
+			"name": "Edit_User_Metadata",
+			"url": "http://127.0.0.1:5000/user/5/edit",
+			"time": 3,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"User screen name is updated correctly": true,
+				"User real name is updated correctly": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"User screen name is updated correctly": {
+					"pass": 1,
+					"fail": 0
+				},
+				"User real name is updated correctly": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"User screen name is updated correctly": true,
+					"User real name is updated correctly": true
+				}
+			]
+		},
+		{
+			"id": "db4e122f-8da7-4065-828e-e2452bbf1ff3",
+			"name": "Create_Post",
+			"url": "http://127.0.0.1:5000/post",
+			"time": 3,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Extract and store post_id and post_key": true,
+				"Response contains post ID": true,
+				"Response contains expected fields": true,
+				"Post ID is a positive integer": true,
+				"Post key is a string": true,
+				"User ID matches expected user ID": true,
+				"post_parentid is null": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Extract and store post_id and post_key": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response contains post ID": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response contains expected fields": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Post ID is a positive integer": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Post key is a string": {
+					"pass": 1,
+					"fail": 0
+				},
+				"User ID matches expected user ID": {
+					"pass": 1,
+					"fail": 0
+				},
+				"post_parentid is null": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Extract and store post_id and post_key": true,
+					"Response contains post ID": true,
+					"Response contains expected fields": true,
+					"Post ID is a positive integer": true,
+					"Post key is a string": true,
+					"User ID matches expected user ID": true,
+					"post_parentid is null": true
+				}
+			]
+		},
+		{
+			"id": "b08f8306-fc24-4200-be8e-cfbe2572e966",
+			"name": "Create_Post_Reply",
+			"url": "http://127.0.0.1:5000/post",
+			"time": 3,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Extract and store post_id and post_key": true,
+				"Response contains post ID": true,
+				"Response contains expected fields": true,
+				"Post ID is a positive integer": true,
+				"Post key is a string": true,
+				"User ID matches expected user ID": true,
+				"post_parentid is correct": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Extract and store post_id and post_key": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response contains post ID": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response contains expected fields": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Post ID is a positive integer": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Post key is a string": {
+					"pass": 1,
+					"fail": 0
+				},
+				"User ID matches expected user ID": {
+					"pass": 1,
+					"fail": 0
+				},
+				"post_parentid is correct": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Extract and store post_id and post_key": true,
+					"Response contains post ID": true,
+					"Response contains expected fields": true,
+					"Post ID is a positive integer": true,
+					"Post key is a string": true,
+					"User ID matches expected user ID": true,
+					"post_parentid is correct": false
+				}
+			]
+		},
+		{
+			"id": "d65e867b-6d36-40f8-9088-3b9b36f7882d",
+			"name": "Get_Post",
+			"url": "http://127.0.0.1:5000//post/12",
+			"time": 3,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response has ID field": true,
+				"Response has Key field": true,
+				"Response has Timestamp field": true,
+				"Response has Message field": true,
+				"Response has Replies field": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response has ID field": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response has Key field": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response has Timestamp field": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response has Message field": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response has Replies field": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response has ID field": true,
+					"Response has Key field": true,
+					"Response has Timestamp field": true,
+					"Response has Message field": true,
+					"Response has Replies field": true
+				}
+			]
+		},
+		{
+			"id": "1f9fe4af-7115-48a6-8313-644351f59e96",
+			"name": "Search_DateTime",
+			"url": "http://127.0.0.1:5000/posts/search/datetime?start_datetime=2023-01-01T00:00:00Z&end_datetime=2023-12-31T23:59:59Z",
+			"time": 3,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200": true,
+				"Response is an array": true,
+				"Check if posts are within the specified date range": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response is an array": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Check if posts are within the specified date range": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 200": true,
+					"Response is an array": true,
+					"Check if posts are within the specified date range": true
+				}
+			]
+		},
+		{
+			"id": "10b260e5-917a-4ed4-97ca-e9537354ab0c",
+			"name": "Search_User",
+			"url": "http://127.0.0.1:5000/posts/search/user?user_id=5",
+			"time": 4,
+			"responseCode": {
+				"code": 200,
+				"name": "OK"
+			},
+			"tests": {
+				"Status code is 200 OK": true,
+				"Response is in JSON format": true
+			},
+			"testPassFailCounts": {
+				"Status code is 200 OK": {
+					"pass": 1,
+					"fail": 0
+				},
+				"Response is in JSON format": {
+					"pass": 1,
+					"fail": 0
+				}
+			},
+			"times": [
+				4
+			],
+			"allTests": [
+				{
+					"Status code is 200 OK": true,
+					"Response is in JSON format": true
+				}
+			]
+		},
+		{
+			"id": "9377e8ae-a05e-42e6-af42-69283ca91407",
+			"name": "Delete_Post",
+			"url": "http://127.0.0.1:5000/post/12/delete/xWNbckC0KqklfZYLReFgMiF9RYc?user_id=5&user_key=bn2GhLr-sHLUP0HwMFGUX9xw-CA",
+			"time": 3,
+			"responseCode": {
+				"code": 415,
+				"name": "UNSUPPORTED MEDIA TYPE"
+			},
+			"tests": {
+				"Status code is 200": false,
+				"Response is an empty JSON object": false,
+				"Post was deleted successfully": false
+			},
+			"testPassFailCounts": {
+				"Status code is 200": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Response is an empty JSON object": {
+					"pass": 0,
+					"fail": 1
+				},
+				"Post was deleted successfully": {
+					"pass": 0,
+					"fail": 1
+				}
+			},
+			"times": [
+				3
+			],
+			"allTests": [
+				{
+					"Status code is 200": false,
+					"Response is an empty JSON object": false,
+					"Post was deleted successfully": false
+				}
+			]
+		}
+	],
+	"count": 1,
+	"totalTime": 29,
+	"collection": {
+		"requests": [
+			{
+				"id": "87e7b4a0-8a8e-4f06-888f-2a69d7dbe82d",
+				"method": "POST"
+			},
+			{
+				"id": "23beffe8-7549-431b-a473-6ed3b60396d9",
+				"method": "GET"
+			},
+			{
+				"id": "03dc6592-4ce3-4442-84d8-c72483636826",
+				"method": "PUT"
+			},
+			{
+				"id": "db4e122f-8da7-4065-828e-e2452bbf1ff3",
+				"method": "POST"
+			},
+			{
+				"id": "b08f8306-fc24-4200-be8e-cfbe2572e966",
+				"method": "POST"
+			},
+			{
+				"id": "d65e867b-6d36-40f8-9088-3b9b36f7882d",
+				"method": "GET"
+			},
+			{
+				"id": "1f9fe4af-7115-48a6-8313-644351f59e96",
+				"method": "GET"
+			},
+			{
+				"id": "10b260e5-917a-4ed4-97ca-e9537354ab0c",
+				"method": "GET"
+			},
+			{
+				"id": "9377e8ae-a05e-42e6-af42-69283ca91407",
+				"method": "DELETE"
+			}
+		]
+	}
+}
