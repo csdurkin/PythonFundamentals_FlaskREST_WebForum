@@ -14,12 +14,6 @@ project/
 ├── cdurkin_project3_enviroment.postman_environment.json
 └── README.md
 ```
-
-## Author
-**Name:** Connor Durkin  
-**Email:** cdurkin@stevens.edu  
-**GitHub Repository:** [csdurkin/PythonFundamentals_FlaskREST_WebForum](https://github.com/csdurkin/cs515_project3)
-
 ---
 
 ## Overview
